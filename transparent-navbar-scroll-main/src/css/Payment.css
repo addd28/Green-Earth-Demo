@@ -1,0 +1,130 @@
+* {
+  box-sizing: border-box;
+}
+
+.payment-page {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 3rem 1rem;
+  margin-top: 20px;
+}
+
+.payment-container {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.payment-card {
+  width: 100%;
+}
+
+.payment-title {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.payment-description {
+  text-align: center;
+}
+
+.payment-tabs {
+  width: 100%;
+}
+
+.payment-tabs-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+}
+
+.payment-tab-content {
+  margin-top: 1.5rem;
+}
+
+.qr-section {
+  text-align: center;
+}
+
+.qr-icon {
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.qr-text {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.account-box {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  text-align: left;
+}
+
+.account-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.payment-button {
+  margin-top: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-spinner {
+  margin-right: 0.5rem;
+  height: 1rem;
+  width: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .payment-page {
+    padding: 2rem 0.75rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-tabs-list {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
