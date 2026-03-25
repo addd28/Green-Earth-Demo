@@ -1,16 +1,42 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 import Index from "./pages/Index.tsx";
+import Donate from "./pages/Donate.tsx";
+import Payment from "./pages/Payment.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import Navbar from "./components/Navbar.tsx";
-import Footer from "./components/Footer.tsx";
 import CampaignAndEventPage from "./pages/CampaignAndEventPage.tsx";
 import DetailPage from "./pages/DetailPage.tsx";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/donate" element={<Donate key={location.pathname} />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/campaignandevent" element={<CampaignAndEventPage />} />
+          <Route path="/campaignandevent/:id" element={<DetailPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -18,15 +44,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/campaignandevent" element={<CampaignAndEventPage />} />
-          <Route path="/campaignandevent/:id" element={<DetailPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-          <Footer />
+        <AppContent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

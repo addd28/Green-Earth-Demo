@@ -1,0 +1,370 @@
+* {
+  box-sizing: border-box;
+}
+
+.donate-page {
+  --gp-green: #16a34a;
+  --gp-dark: #14532d;
+
+  --background: 0 0% 100%;
+  --border: 240 5.9% 90%;
+  --foreground: 222.2 84% 4.9%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --card: 0 0% 100%;
+  --primary-foreground: 0 0% 100%;
+
+  min-height: 100vh;
+  width: 100%;
+}
+
+.hero-section {
+  background: linear-gradient(
+    to bottom right,
+    var(--gp-green),
+    rgba(22, 163, 74, 0.9),
+    var(--gp-dark)
+  );
+  color: hsl(var(--primary-foreground));
+  padding: 6rem 1rem 4rem;
+}
+
+.hero-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 3rem;
+  line-height: 1.15;
+  margin: 0 0 1.5rem;
+}
+
+.hero-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+.donation-section,
+.faq-section {
+  padding: 4rem 1rem;
+  background: hsl(var(--background));
+}
+
+.impact-section {
+  padding: 4rem 1rem;
+  background: #f9fafb;
+}
+
+.section-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-container.wide {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-heading {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+  color: hsl(var(--foreground));
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+}
+
+.tiers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.tier-card {
+  border: 2px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: hsl(var(--card));
+  height: 100%;
+}
+
+.tier-card:hover {
+  border-color: var(--gp-green);
+  background: #f0fdf4;
+}
+
+.tier-selected {
+  border-color: var(--gp-green);
+  background: #ecfdf5;
+  transform: translateY(-4px);
+}
+
+.tier-amount {
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+  color: hsl(var(--foreground));
+}
+
+.tier-frequency {
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 0.5rem;
+}
+
+.tier-title {
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: hsl(var(--foreground));
+}
+
+.tier-description {
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 1rem;
+}
+
+.tier-impact-box {
+  background: #dcfce7;
+  padding: 0.7rem;
+  border-radius: 6px;
+}
+
+.tier-impact-text {
+  font-size: 0.8rem;
+  color: #166534;
+  font-weight: 700;
+  margin: 0;
+}
+
+.custom-donation-box {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.custom-title {
+  font-size: 1.4rem;
+  margin: 0 0 1.5rem;
+  color: hsl(var(--foreground));
+}
+
+.custom-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.custom-input {
+  flex: 1 1 240px;
+  min-width: 220px;
+  height: 48px;
+  padding: 0 1rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: #fff;
+}
+
+.custom-select {
+  flex: 0 0 140px;
+  min-width: 140px;
+  height: 48px;
+  padding: 0 1rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: #fff;
+}
+
+.custom-input:focus,
+.custom-select:focus {
+  border-color: var(--gp-green);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.12);
+}
+
+.donate-button {
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 2rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--gp-green);
+  color: hsl(var(--primary-foreground));
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.donate-button:hover {
+  background: #15803d;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.impact-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  height: 100%;
+}
+
+.impact-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.impact-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+}
+
+.impact-icon-box {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #bbf7d0;
+  border-radius: 999px;
+}
+
+.impact-icon {
+  color: var(--gp-green);
+}
+
+.impact-amount {
+  font-size: 1.1rem;
+  color: var(--gp-green);
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.impact-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: hsl(var(--foreground));
+  margin: 0;
+}
+
+.faq-question {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.faq-question:hover {
+  color: var(--gp-green);
+}
+
+.faq-answer {
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+}
+
+.cta-section {
+  background: linear-gradient(to right, var(--gp-green), var(--gp-dark));
+  color: hsl(var(--primary-foreground));
+  padding: 4rem 1rem;
+}
+
+.cta-container {
+  text-align: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 2rem;
+  margin: 0 0 1.5rem;
+}
+
+.cta-text {
+  margin: 0 0 2rem;
+  opacity: 0.9;
+}
+
+.cta-button {
+  background: #fff;
+  color: var(--gp-green);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+  .tiers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .impact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tiers-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .impact-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-title {
+    font-size: 2.25rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .custom-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-input,
+  .custom-select,
+  .donate-button {
+    width: 100%;
+  }
+}
