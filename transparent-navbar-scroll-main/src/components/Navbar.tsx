@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, ChevronDown, Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -11,7 +13,13 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinks = ["Issues we work on", "Get involved", "News and Stories", "About us"];
+  const navLinks = [
+  
+  { name: "Events and Campaigns", path: "/campaignandevent" },
+  { name: "News and Stories", path: "/news" },
+  { name: "Sponsors", path: "/sponsors" },
+  { name: "About us", path: "/about" }
+];
 
   return (
     <nav
@@ -24,21 +32,21 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between h-16 px-4 lg:px-8">
         {/* Logo */}
         <a href="/" className={`font-heading text-2xl tracking-wider uppercase ${scrolled ? "text-gp-green" : "text-gp-green-light"}`}>
-          GREENPEACE
+          GREENEARTH
         </a>
 
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a
-              key={link}
-              href="#"
+            <Link
+              key={link.name}
+              to={link.path} // Dùng to thay cho href
               className={`text-sm font-semibold transition-colors hover:text-gp-green ${
                 scrolled ? "text-foreground" : "text-primary-foreground"
               }`}
             >
-              {link}
-            </a>
+              {link.name}
+            </Link>
           ))}
           <button className="bg-gp-green text-primary-foreground px-5 py-2 text-sm font-bold flex items-center gap-1 hover:brightness-110 transition">
             Donate <ChevronDown size={14} />
@@ -72,9 +80,14 @@ const Navbar = () => {
         <div className="lg:hidden bg-card border-t shadow-lg">
           <div className="flex flex-col p-4 gap-4">
             {navLinks.map((link) => (
-              <a key={link} href="#" className="text-foreground font-semibold text-sm">
-                {link}
-              </a>
+              <Link 
+                key={link.name} 
+                to={link.path} 
+                className="text-foreground font-semibold text-sm"
+                onClick={() => setMobileOpen(false)} // Tự đóng menu khi nhấn chuyển trang
+              >
+                {link.name}
+              </Link>
             ))}
             <button className="bg-gp-green text-primary-foreground px-5 py-2 text-sm font-bold w-fit">
               Donate
