@@ -13,8 +13,7 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-  
-  { name: "Events and Campaigns", path: "/campaignandevent" },
+  { name: "Campaigns", path: "/campaign" },
   { name: "News and Stories", path: "/news" },
   { name: "Sponsors", path: "/sponsors" },
   { name: "About us", path: "/about" }
