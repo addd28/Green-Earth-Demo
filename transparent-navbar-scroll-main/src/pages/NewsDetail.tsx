@@ -14,11 +14,18 @@ export default function NewsDetail() {
     const fetchData = async () => {
       try {
         setLoading(true);
+<<<<<<< HEAD
+        // Lưu ý: Đảm bảo Spring Boot của bạn có API GET này
+        const response = await axios.get(`http://localhost:8080/api/green_earth/article/${id}`);
+        if (response.data && response.data.data) {
+          setArticle(response.data.data);
+=======
         
         // 1. Lấy chi tiết bài viết
         const articleRes = await axios.get(`http://localhost:8081/api/green_earth/article/${id}`);
         if (articleRes.data && articleRes.data.data) {
           setArticle(articleRes.data.data);
+>>>>>>> 264cbf38cc1f824654127ec94991447cbed84503
         }
 
         // 2. Lấy danh sách danh mục (Giống bên Admin để map tên)

@@ -27,7 +27,7 @@ export default function CampaignList() {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get('http://localhost:8081/api/green_earth/campaign');
+        const response = await axios.get('http://localhost:8080/api/green_earth/campaign');
         if (response.data && response.data.data) {
           setCampaigns(response.data.data);
         }
