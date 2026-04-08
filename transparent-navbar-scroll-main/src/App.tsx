@@ -16,6 +16,7 @@ import CampaignDetail from "./pages/CampaignDetail.tsx";
 import News from "./pages/News.tsx";
 import NewsDetail from "./pages/NewsDetail.tsx";
 import AboutUs from "./pages/AboutUs.tsx";
+import Sponsors from "./pages/Sponsors.tsx";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,8 @@ const AppContent = () => {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/events" element={<EventPage />} />
         </Routes>
       </main>
 
