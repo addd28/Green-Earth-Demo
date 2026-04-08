@@ -1,21 +1,42 @@
-// src/pages/CampaignDetail.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import { Calendar, MapPin, Users, ArrowLeft, Loader2, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Heart, MapPin, Calendar, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const API_URL = "http://localhost:8081/api/green_earth/campaign";
+const DONATION_API = "http://localhost:8081/api/green_earth/donation";
 
 export default function CampaignDetail() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [campaign, setCampaign] = useState<any>(null);
-  const [events, setEvents] = useState<any[]>([]); 
+  const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // State cho Modal Đăng ký
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [donateAmount, setDonateAmount] = useState("");
+  const [donorName, setDonorName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [message, setMessage] = useState({ type: '', content: '' });
+
+  const fetchData = async () => {
+    try {
+      const [campRes, donRes] = await Promise.all([
+        fetch(`${API_URL}/${id}`),
+        fetch(DONATION_API)
+      ]);
+      
+      const campResult = await campRes.json();
+      const donResult = await donRes.json();
+
+      setCampaign(campResult.data);
+      setDonations(donResult.data || donResult || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+<<<<<<< HEAD
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -40,160 +61,195 @@ export default function CampaignDetail() {
     };
 
     if (id) fetchData();
+=======
+    fetchData();
+>>>>>>> 264cbf38cc1f824654127ec94991447cbed84503
   }, [id]);
 
-  const handleRegisterEvent = (e: React.FormEvent) => {
+  const handleDonate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!donateAmount || isSubmitting) return;
     setIsSubmitting(true);
-    setTimeout(() => {
+    setMessage({ type: '', content: '' });
+
+    try {
+      const response = await fetch(DONATION_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: parseInt(id as string),
+          amount: parseFloat(donateAmount),
+          donorName: donorName.trim() === "" ? "Anonymous" : donorName, // Gửi tên người nhập
+          userId: null, // Bỏ user ID 1 đi (hoặc để null nếu backend cho phép ẩn danh)
+          paymentMethod: "BANK_TRANSFER",
+          status: "COMPLETED"
+        })
+      });
+
+      if (response.ok) {
+        setMessage({ type: 'success', content: 'Cảm ơn bạn đã đóng góp!' });
+        setDonateAmount("");
+        setDonorName(""); // Xóa trắng ô nhập tên
+        await fetchData(); 
+      } else {
+        throw new Error("Giao dịch thất bại");
+      }
+    } catch (error) {
+      setMessage({ type: 'error', content: 'Có lỗi xảy ra, vui lòng thử lại.' });
+    } finally {
       setIsSubmitting(false);
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setSelectedEvent(null); 
-      }, 2000);
-    }, 1000);
+    }
   };
 
-  // Cắt bỏ phần giờ T00:00:00.000 từ chuỗi ngày tháng của event_date
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "Sắp thông báo";
-    return dateString.split('T')[0];
-  };
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-emerald-600" /></div>;
+  if (!campaign) return <div className="text-center py-20 text-slate-500 font-medium">Campaign not found.</div>;
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center">
-      <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
-    </div>
-  );
+  const totalRaised = donations
+    .filter(d => Number(d.campaignId) === Number(id))
+    .reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
 
-  if (!campaign) return <div className="text-center py-20">Không tìm thấy chiến dịch!</div>;
+  const goal = Number(campaign.targetAmount) || 0;
+  const progress = goal > 0 ? Math.min(Math.round((totalRaised / goal) * 100), 100) : 0;
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-20 relative">
+    <div className="bg-slate-50 min-h-screen pb-20 text-left">
       
-      {/* HEADER CHI TIẾT */}
-      <div className="bg-emerald-900 text-white pt-32 pb-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Link to="/campaign" className="inline-flex items-center gap-2 text-emerald-300 hover:text-white mb-6 transition-colors">
-            <ArrowLeft className="w-5 h-5" /> Quay lại danh sách
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">{campaign.title}</h1>
-          <div className="flex flex-wrap gap-6 text-emerald-100">
-            <span className="flex items-center gap-2"><MapPin className="w-5 h-5" /> {campaign.location}</span>
-            <span className="flex items-center gap-2"><Users className="w-5 h-5" /> Cần {campaign.targetVolunteers} TNV</span>
-            <span className="flex items-center gap-2"><Calendar className="w-5 h-5" /> Hạn chót: {formatDate(campaign.endDate)}</span>
+      {/* --- HERO SECTION ĐÃ ĐƯỢC LÀM LẠI THEO STYLE CỦA NEWSDETAIL --- */}
+      <div className="bg-emerald-900 text-white pt-32 pb-24 px-4 relative overflow-hidden">
+        {/* Ảnh nền được làm mờ để chữ và menu nổi bật */}
+        {campaign.image && (
+          <div className="absolute inset-0 opacity-20">
+            <img 
+              src={campaign.image} 
+              alt="cover" 
+              className="w-full h-full object-cover" 
+            />
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 mt-8">
+        )}
         
-        {/* ĐÃ SỬA LỖI TRÀN CHỮ: Thêm "break-words overflow-hidden w-full" */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 md:p-12 mb-12">
-          <h2 className="text-2xl font-bold text-slate-800 mb-8 border-b pb-4">Câu chuyện chiến dịch</h2>
-          <div 
-            className="prose prose-emerald max-w-none text-slate-700 leading-relaxed [&>p]:mb-4 break-words overflow-hidden w-full"
-            dangerouslySetInnerHTML={{ __html: campaign.description }} 
-          />
-        </div>
+        {/* Gradient mờ ảo đổ từ trên xuống giúp menu bên ngoài hiển thị rõ ràng */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-transparent"></div>
 
-        {/* DANH SÁCH SỰ KIỆN */}
-        <div>
-          <div className="flex justify-between items-end mb-6">
-            <h2 className="text-3xl font-bold text-slate-900">Sự kiện sắp tới</h2>
-            <p className="text-slate-500 text-sm hidden md:block">Hãy đăng ký tham gia cùng chúng tôi!</p>
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Nút quay lại giống trang News */}
+          <Link to="/campaign" className="inline-flex items-center gap-2 text-emerald-300 hover:text-white mb-6 transition-colors font-medium">
+            <ArrowLeft className="w-5 h-5" /> Back to Campaigns
+          </Link>
+          
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
+            {campaign.title}
+          </h1>
+          
+          <div className="flex flex-wrap gap-6 text-emerald-100 border-t border-emerald-800/50 pt-5 mt-4">
+            <span className="flex items-center gap-2 font-medium">
+              <MapPin className="w-5 h-5 text-emerald-400" /> {campaign.location}
+            </span>
+            <span className="flex items-center gap-2 font-medium">
+              <Calendar className="w-5 h-5 text-emerald-400" /> {new Date(campaign.startDate).toLocaleDateString('en-GB')}
+            </span>
           </div>
-
-          {events.length > 0 ? (
-            <div className="space-y-4">
-              {events.map((ev) => (
-                <div key={ev.id} className="bg-white rounded-2xl p-6 border border-emerald-100 shadow-sm flex flex-col md:flex-row gap-6 justify-between items-center hover:border-emerald-300 transition-colors">
-                  <div>
-                    <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">
-                      Mở đăng ký
-                    </span>
-                    {/* ĐÃ SỬA: Đổi ev.name thành ev.title theo đúng DB */}
-                    <h3 className="text-xl font-bold text-slate-800">{ev.title}</h3>
-                    
-                    <p className="text-slate-500 mt-2 flex items-center gap-2">
-                      {/* ĐÃ SỬA: Đổi ev.startDate thành ev.eventDate (hoặc ev.event_date) */}
-                      <Calendar className="w-4 h-4 text-emerald-600" /> {formatDate(ev.eventDate || ev.event_date)}
-                    </p>
-                    {ev.location && (
-                      <p className="text-slate-500 mt-1 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-emerald-600" /> {ev.location}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <button 
-                    onClick={() => setSelectedEvent(ev)}
-                    className="bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-emerald-700 w-full md:w-auto transition-colors shadow-lg shadow-emerald-200"
-                  >
-                    Tham gia ngay
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-10 border border-slate-100 text-center flex flex-col items-center">
-              <AlertCircle className="w-10 h-10 text-slate-300 mb-3" />
-              <p className="text-slate-500 font-medium">Hiện tại chưa có sự kiện nào cho chiến dịch này.</p>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* TUYẾN 3: MODAL ĐĂNG KÝ SỰ KIỆN */}
-      {selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
-            <button 
-              onClick={() => !isSubmitting && setSelectedEvent(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800"
-            >
-              <X className="w-6 h-6" />
-            </button>
+      {/* --- MAIN CONTENT SECTION --- */}
+      {/* Thêm -mt-10 và relative z-10 để nội dung đẩy nhẹ lên đè vào phần background xanh ngọc */}
+      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 -mt-10">
+        
+        {/* Left: Description */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white p-6 md:p-10 rounded-3xl shadow-lg border border-slate-100">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b pb-4">About this campaign</h2>
+            
+            {/* Hình ảnh minh họa chính sẽ hiển thị rõ nét ở đây thay vì bị mờ ở Header */}
+            <div className="mb-10 rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+                <img src={campaign.image} alt="Campaign illustration" className="w-full max-h-[400px] object-cover" />
+            </div>
 
-            {submitSuccess ? (
-              <div className="text-center py-8">
-                <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Đăng ký thành công!</h3>
-                <p className="text-slate-500">Cảm ơn bạn đã tham gia "{selectedEvent.title}". Chúng tôi sẽ liên hệ sớm nhất.</p>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Đăng ký Sự kiện</h3>
-                <p className="text-slate-500 text-sm mb-6">Sự kiện: <strong className="text-emerald-700">{selectedEvent.title}</strong></p>
-                
-                <form onSubmit={handleRegisterEvent} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Họ và tên</label>
-                    <input type="text" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" placeholder="Nhập tên của bạn" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Email</label>
-                    <input type="email" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" placeholder="Địa chỉ email" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Số điện thoại</label>
-                    <input type="tel" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" placeholder="Nhập số điện thoại" />
-                  </div>
-                  
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition-colors mt-4 flex justify-center items-center"
-                  >
-                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Xác nhận Đăng ký'}
-                  </button>
-                </form>
-              </>
-            )}
+            <div 
+              className="prose prose-emerald max-w-none text-slate-600 leading-loose break-words overflow-hidden" 
+              style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+              dangerouslySetInnerHTML={{ __html: campaign.description }} 
+            />
           </div>
         </div>
-      )}
+
+        {/* Right: Donation Box */}
+        <div className="relative">
+          <div className="bg-white p-8 rounded-3xl shadow-xl border border-emerald-100 lg:sticky lg:top-24">
+            <div className="flex items-center justify-between mb-4">
+               <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-full uppercase tracking-wider">Progress</span>
+               <span className="text-3xl font-black text-slate-900">{progress}%</span>
+            </div>
+
+            <div className="w-full h-3.5 bg-slate-100 rounded-full mb-8 overflow-hidden shadow-inner">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 mb-8 bg-slate-50 p-4 rounded-2xl">
+              <div>
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Raised</p>
+                <p className="text-2xl font-bold text-emerald-600">${totalRaised.toLocaleString()}</p>
+              </div>
+              <div className="text-right border-l border-slate-200 pl-4">
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Goal</p>
+                <p className="text-2xl font-bold text-slate-900">${goal.toLocaleString()}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleDonate} className="space-y-5 pt-2">
+              <p className="text-sm font-bold text-slate-700 ml-1">Support this cause</p>
+              
+              {/* Ô NHẬP TÊN (MỚI THÊM) */}
+              <div className="relative group">
+                <input 
+                  type="text"
+                  placeholder="Your Name (Optional)"
+                  value={donorName}
+                  onChange={(e) => setDonorName(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-slate-700"
+                />
+              </div>
+
+              {/* Ô NHẬP TIỀN CŨ CỦA BẠN */}
+              <div className="relative group">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 group-focus-within:text-emerald-500 transition-colors">$</span>
+                <input 
+                  type="number"
+                  placeholder="0.00"
+                  value={donateAmount}
+                  onChange={(e) => setDonateAmount(e.target.value)}
+                  className="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-xl"
+                  required
+                />
+              </div>
+
+              {message.content && (
+                <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-4 rounded-xl text-sm font-semibold flex items-center gap-3 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}
+                >
+                  {message.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                  {message.content}
+                </motion.div>
+              )}
+
+              <button 
+                disabled={isSubmitting}
+                className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-xl shadow-emerald-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-wider"
+              >
+                {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Heart className="w-6 h-6 fill-white/20" />}
+                Donate Now
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

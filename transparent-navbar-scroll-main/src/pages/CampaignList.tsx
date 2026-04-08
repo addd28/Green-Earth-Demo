@@ -2,12 +2,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { MapPin, Users, Loader2 } from 'lucide-react';
+import { MapPin, Users, Loader2, Calendar } from 'lucide-react'; // Thêm Calendar icon
 
 const stripHtmlTags = (htmlString: string) => {
   if (!htmlString) return '';
   const doc = new DOMParser().parseFromString(htmlString, 'text/html');
   return doc.body.textContent || "";
+};
+
+// Hàm helper để định dạng ngày tháng
+const formatDate = (dateString: string) => {
+  if (!dateString) return "TBD";
+  return new Date(dateString).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
 };
 
 export default function CampaignList() {
@@ -22,7 +32,7 @@ export default function CampaignList() {
           setCampaigns(response.data.data);
         }
       } catch (err) {
-        console.error("Lỗi tải chiến dịch", err);
+        console.error("Error loading campaigns", err);
       } finally {
         setLoading(false);
       }
@@ -69,6 +79,12 @@ export default function CampaignList() {
               </div>
 
               <div className="p-6 flex-1 flex flex-col">
+                {/* Hiển thị Ngày bắt đầu - Ngày kết thúc */}
+                <div className="flex items-center gap-2 text-emerald-600 text-xs font-bold mb-3">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}</span>
+                </div>
+
                 <p className="text-slate-600 text-sm mb-6 line-clamp-3 flex-1">
                   {stripHtmlTags(campaign.description)}
                 </p>
@@ -82,7 +98,7 @@ export default function CampaignList() {
                   to={`/campaign/${campaign.id}`} 
                   className="block w-full text-center border-2 border-emerald-600 text-emerald-700 rounded-full py-2.5 font-bold hover:bg-emerald-600 hover:text-white transition-colors"
                 >
-                  XEM CHI TIẾT
+                  VIEW DETAILS
                 </Link>
               </div>
             </div>

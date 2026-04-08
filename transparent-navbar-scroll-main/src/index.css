@@ -54,4 +54,46 @@
   h1, h2, h3, h4 {
     @apply font-heading;
   }
+  /* Định dạng cho nội dung đổ từ Quill */
+.about-content-rich-text {
+    line-height: 1.8;
+    color: #334155; /* Màu chữ xám đậm */
+    font-size: 1.1rem;
+}
+
+/* Chỉnh khoảng cách cho các đoạn văn */
+.about-content-rich-text p {
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+/* Chỉnh cỡ chữ cho các tiêu đề (H1, H2, H3) */
+.about-content-rich-text h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #059669; /* Màu xanh của bạn */
+    margin: 2rem 0 1rem 0;
+}
+
+.about-content-rich-text h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 1.5rem 0 1rem 0;
+}
+
+/* Chỉnh hiển thị cho hình ảnh */
+.about-content-rich-text img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 2rem auto;
+    display: block;
+}
+
+/* Chỉnh cho danh sách (nếu có) */
+.about-content-rich-text ul {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
 }
