@@ -14,7 +14,7 @@ export default function NewsDetail() {
       try {
         setLoading(true);
         // Lưu ý: Đảm bảo Spring Boot của bạn có API GET này
-        const response = await axios.get(`http://localhost:8081/api/green_earth/article/${id}`);
+        const response = await axios.get(`http://localhost:8080/api/green_earth/article/${id}`);
         if (response.data && response.data.data) {
           setArticle(response.data.data);
         }

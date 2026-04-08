@@ -20,7 +20,7 @@ export default function CampaignDetail() {
       try {
         setLoading(true);
         // Lấy chi tiết Chiến dịch
-        const campRes = await axios.get(`http://localhost:8081/api/green_earth/campaign/${id}`);
+        const campRes = await axios.get(`http://localhost:8080/api/green_earth/campaign/${id}`);
         if (campRes.data && campRes.data.data) {
           setCampaign(campRes.data.data);
         }
