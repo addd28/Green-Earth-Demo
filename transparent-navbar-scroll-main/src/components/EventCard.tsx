@@ -10,7 +10,7 @@ const EventCard = ({ event }: any) => {
     setLoading(true);
 
     try {
-      await fetch("http://localhost:8081/api/event-participants", {
+      await fetch("http://localhost:8080/api/event-participants", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

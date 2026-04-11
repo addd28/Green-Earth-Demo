@@ -86,7 +86,7 @@ const Payment = () => {
 
     try {
       // Kiểm tra lại port 8081 hay 8080 (XAMPP của bạn đang hiện 8080)
-      const response = await fetch("http://localhost:8081/api/green_earth/donation", {
+      const response = await fetch("http://localhost:8080/api/green_earth/donation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

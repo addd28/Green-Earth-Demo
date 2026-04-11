@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { Heart, MapPin, Calendar, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const API_URL = "http://localhost:8081/api/green_earth/campaign";
-const DONATION_API = "http://localhost:8081/api/green_earth/donation";
+const API_URL = "http://localhost:8080/api/green_earth/campaign";
+const DONATION_API = "http://localhost:8080/api/green_earth/donation";
 
 export default function CampaignDetail() {
   const { id } = useParams();
@@ -36,34 +36,7 @@ export default function CampaignDetail() {
   };
 
   useEffect(() => {
-<<<<<<< HEAD
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Lấy chi tiết Chiến dịch
-        const campRes = await axios.get(`http://localhost:8080/api/green_earth/campaign/${id}`);
-        if (campRes.data && campRes.data.data) {
-          setCampaign(campRes.data.data);
-        }
-
-        // Lấy danh sách Sự kiện
-
-        const eventRes = await axios.get(`http://localhost:8081/api/green_earth/event/campaign/${id}`);
-        console.log("=== API SỰ KIỆN TRẢ VỀ ===", eventRes.data); // THÊM DÒNG NÀY ĐỂ SOI DỮ LIỆU
-        if (eventRes.data && eventRes.data.data) {
-          setEvents(eventRes.data.data);
-        }
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchData();
-=======
     fetchData();
->>>>>>> 264cbf38cc1f824654127ec94991447cbed84503
   }, [id]);
 
   const handleDonate = async (e: React.FormEvent) => {

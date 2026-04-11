@@ -17,7 +17,7 @@ export default function EventList({ campaignId, onRegisterClick }: EventListProp
       try {
         setLoading(true);
         // Thay đường dẫn này bằng API thực tế của bạn bên Spring Boot
-        const response = await axios.get(`http://localhost:8081/api/green_earth/event/campaign/${campaignId}`);
+        const response = await axios.get(`http://localhost:8080/api/green_earth/event/campaign/${campaignId}`);
         
         if (response.data && response.data.data) {
           setEvents(response.data.data);

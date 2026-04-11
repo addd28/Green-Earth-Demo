@@ -29,7 +29,7 @@ const Donate = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await fetch("http://localhost:8081/api/green_earth/campaign");
+        const response = await fetch("http://localhost:8080/api/green_earth/campaign");
         const result = await response.json();
         // Giả sử API trả về { data: [...] } hoặc [...]
         const data = result.data || result;

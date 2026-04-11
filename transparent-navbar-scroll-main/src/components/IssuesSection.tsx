@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react"; // Thêm icon mũi tên
 
-const API_CAMPAIGNS = "http://localhost:8081/api/green_earth/campaign";
+const API_CAMPAIGNS = "http://localhost:8080/api/green_earth/campaign";
 
 const IssuesSection = () => {
   const [campaigns, setCampaigns] = useState([]);
