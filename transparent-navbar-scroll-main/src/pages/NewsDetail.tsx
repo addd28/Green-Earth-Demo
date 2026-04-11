@@ -7,22 +7,22 @@ import { Calendar, User, ArrowLeft, Loader2, Tag } from 'lucide-react';
 export default function NewsDetail() {
   const { id } = useParams(); 
   const [article, setArticle] = useState<any>(null);
-  const [categories, setCategories] = useState<any[]>([]); // Thêm state lưu danh mục
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // 1. Lấy chi tiết bài viết
-        const articleRes = await axios.get(`http://localhost:8080/api/green_earth/article/${id}`);
+
+        // 1. Lấy chi tiết bài viết (dùng 8081 cho đồng bộ backend mới)
+        const articleRes = await axios.get(`http://localhost:8081/api/green_earth/article/${id}`);
         if (articleRes.data && articleRes.data.data) {
           setArticle(articleRes.data.data);
         }
 
-        // 2. Lấy danh sách danh mục (Giống bên Admin để map tên)
-        const categoryRes = await axios.get('http://localhost:8080/api/green_earth/article_categories');
+        // 2. Lấy danh mục
+        const categoryRes = await axios.get('http://localhost:8081/api/green_earth/article_categories');
         if (categoryRes.data && categoryRes.data.data) {
           setCategories(categoryRes.data.data);
         }
@@ -37,20 +37,18 @@ export default function NewsDetail() {
     if (id) fetchData();
   }, [id]);
 
-  // Hàm helper lấy tên danh mục dựa trên ID
+  // Lấy tên danh mục
   const getCategoryName = () => {
     if (!article) return "Green News";
-    
-    // Nếu API đã trả về sẵn object category.name
+
     if (article.category?.name) return article.category.name;
-    
-    // Nếu không, tìm trong danh sách categories vừa fetch về
+
     const found = categories.find(c => 
       c.id === article.categoryId || 
       c.id === article.category_id || 
       c.id === article.category?.id
     );
-    
+
     return found ? found.name : "Environmental";
   };
 
@@ -66,7 +64,11 @@ export default function NewsDetail() {
     </div>
   );
 
-  if (!article) return <div className="text-center py-20 text-slate-500 bg-slate-50 min-h-screen">Article not found!</div>;
+  if (!article) return (
+    <div className="text-center py-20 text-slate-500 bg-slate-50 min-h-screen">
+      Article not found!
+    </div>
+  );
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 relative">
@@ -85,12 +87,13 @@ export default function NewsDetail() {
           <div className="mb-4">
             <span className="bg-emerald-700 text-emerald-100 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest inline-flex items-center gap-1.5 border border-emerald-600/50">
               <Tag className="w-3 h-3" /> 
-              {/* SỬA TẠI ĐÂY: Gọi hàm getCategoryName */}
               {getCategoryName()}
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">{article.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">
+            {article.title}
+          </h1>
           
           <div className="flex flex-wrap gap-6 text-emerald-100 text-sm border-t border-emerald-800/50 pt-4 mt-4">
             <span className="flex items-center gap-2">
@@ -108,7 +111,11 @@ export default function NewsDetail() {
       <div className="max-w-4xl mx-auto px-4 mt-8 relative z-10 -mt-8">
         <div className="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 md:p-14 mb-12">
           {article.image && (
-            <img src={article.image} alt={article.title} className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm" />
+            <img 
+              src={article.image} 
+              alt={article.title} 
+              className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm" 
+            />
           )}
           <div 
             className="prose prose-emerald prose-lg max-w-none text-slate-700 leading-relaxed break-words w-full"

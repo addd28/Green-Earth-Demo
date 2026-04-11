@@ -25,7 +25,7 @@ export default function News() {
     const fetchArticles = async () => {
       try {
         setLoading(true);       
-        const response = await axios.get('http://localhost:8080/api/green_earth/article');
+        const response = await axios.get('http://localhost:8081/api/green_earth/article');
         if (response.data && response.data.data) {
           setArticles(response.data.data);
         }
