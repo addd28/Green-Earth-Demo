@@ -1,280 +1,202 @@
-import { useState, useEffect } from "react"; // Thêm useEffect
-import { useNavigate, useLocation } from "react-router-dom"; // Thêm useLocation
-import { Check } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Loader2, CreditCard, QrCode, TrendingUp, ChevronDown, ChevronUp, Calendar, MapPin, Lock } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import "../css/Donate.css";
 
 const Donate = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Lấy campaignId từ URL nếu có (ví dụ: /donate?campaignId=2)
   const queryParams = new URLSearchParams(location.search);
   const initialCampaignId = queryParams.get("campaignId") || "";
 
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [donationAmount, setDonationAmount] = useState("");
-  const [frequency, setFrequency] = useState("Monthly");
-
-  // MỚI: Quản lý danh sách và lựa chọn chiến dịch
   const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [selectedCampaignId, setSelectedCampaignId] = useState(initialCampaignId);
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
+  const [donationAmount, setDonationAmount] = useState("");
+  const [donorName, setDonorName] = useState("");
+  const [message, setMessage] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("QR_CODE");
 
-  // MỚI: Lấy danh sách chiến dịch khi load trang
+  useEffect(() => {
+    const savedData = localStorage.getItem("pending_donation");
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setDonationAmount(parsed.donationAmount || "");
+      setDonorName(parsed.donorName || "");
+      setMessage(parsed.message || "");
+      setPaymentMethod(parsed.paymentMethod || "QR_CODE");
+    }
+  }, []);
+
+  useEffect(() => {
+    const dataToSave = { donationAmount, donorName, message, paymentMethod };
+    localStorage.setItem("pending_donation", JSON.stringify(dataToSave));
+  }, [donationAmount, donorName, message, paymentMethod]);
+
+  const donationTiers = [
+    { id: "tier-25", amount: 25 },
+    { id: "tier-50", amount: 50 },
+    { id: "tier-100", amount: 100 },
+    { id: "tier-250", amount: 250 },
+  ];
+
+  const faqs = [
+    { q: "Is my donation tax-deductible?", a: "Yes! GreenEarth is a registered non-profit organization." },
+    { q: "How will my money be used?", a: "We invest directly into field campaigns, environmental protection initiatives, and community education." },
+    { q: "Can I cancel my donation?", a: "Of course! You have complete control over your contributions and can contact us for any changes." }
+  ];
+
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/green_earth/campaign");
         const result = await response.json();
-        // Giả sử API trả về { data: [...] } hoặc [...]
         const data = result.data || result;
         setCampaigns(data);
-        
-        // Nếu không có ID từ URL, lấy ID của chiến dịch đầu tiên làm mặc định
-        if (!initialCampaignId && data.length > 0) {
-          setSelectedCampaignId(data[0].id.toString());
-        }
-      } catch (error) {
-        console.error("Error fetching campaigns:", error);
-      }
+        const defaultCamp = initialCampaignId ? data.find((c: any) => c.id.toString() === initialCampaignId) : data[0];
+        setSelectedCampaign(defaultCamp);
+      } catch (error) { console.error(error); } finally { setLoading(false); }
     };
     fetchCampaigns();
   }, [initialCampaignId]);
 
-  const donationTiers = [
-    {
-      id: "monthly-25",
-      amount: 25,
-      frequency: "Monthly",
-      title: "Seedling",
-      description: "Help protect local ecosystems",
-      impact: "Funds research in one region",
-    },
-    {
-      id: "monthly-50",
-      amount: 50,
-      frequency: "Monthly",
-      title: "Advocate",
-      description: "Support global campaigns",
-      impact: "Funds multiple campaigns",
-    },
-    {
-      id: "monthly-100",
-      amount: 100,
-      frequency: "Monthly",
-      title: "Guardian",
-      description: "Make a major difference",
-      impact: "Supports entire initiatives",
-    },
-    {
-      id: "monthly-250",
-      amount: 250,
-      frequency: "Monthly",
-      title: "Protector",
-      description: "Be a conservation champion",
-      impact: "Leads transformative projects",
-    },
-  ];
-
-  const impacts = [
-    { amount: "$10", impact: "Provides one person with environmental education materials" },
-    { amount: "$25", impact: "Supports one day of ocean conservation research" },
-    { amount: "$50", impact: "Funds a wildlife habitat restoration project for one week" },
-    { amount: "$100", impact: "Protects 100 acres of rainforest from deforestation" },
-    { amount: "$250", impact: "Powers a full month of climate change advocacy campaigns" },
-    { amount: "$500+", impact: "Funds an entire community environmental initiative" },
-  ];
-
-  const faqs = [
-    {
-      q: "Is my donation tax-deductible?",
-      a: "Yes! Greenpeace is a registered nonprofit organization. Your donation is tax-deductible to the fullest extent allowed by law. You'll receive a receipt for your records.",
-    },
-    {
-      q: "How is my donation used?",
-      a: "We invest your donation directly into campaigns that create real environmental change. This includes research, direct action, legal advocacy, and community education programs around the world.",
-    },
-    {
-      q: "Can I change my donation amount or cancel anytime?",
-      a: "Absolutely! You can adjust your monthly donation or cancel at any time without penalty. You have complete control over your contribution.",
-    },
-    {
-      q: "Is my payment information secure?",
-      a: "Yes. We use industry-standard encryption and security protocols. We never share your information with third parties and comply with all data protection regulations.",
-    },
-    {
-      q: "How often will I be charged?",
-      a: "Monthly donors are charged on the same day each month. One-time donors are charged once. You'll receive a confirmation email after each transaction.",
-    },
-    {
-      q: "Can I donate in a different currency?",
-      a: "Yes! We accept donations in multiple currencies including USD, EUR, GBP, CAD, AUD, and more. The currency options will appear during checkout.",
-    },
-  ];
+  const isCompleted = () => selectedCampaign?.status === "COMPLETED";
 
   const handleDonateNow = () => {
+    if (isCompleted()) return alert("This campaign is closed.");
     const amount = parseFloat(donationAmount);
-    if (!amount || amount <= 0) {
-      alert("Please enter a valid donation amount.");
-      return;
-    }
-    
+    if (!amount || amount <= 0) return alert("Please enter a valid amount.");
+
     navigate('/payment', { 
-      state: { 
-        amount: amount, 
-        frequency,
-        campaignId: parseInt(selectedCampaignId) // Gửi kèm ID chiến dịch
-      } 
+      state: { amount, donorName, message, paymentMethod, campaignId: selectedCampaign?.id } 
     });
   };
+
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-emerald-600" /></div>;
 
   return (
     <div className="donate-page">
       <section className="hero-section">
         <div className="hero-container">
           <h1 className="hero-title">Be the Change Our Planet Needs</h1>
-          <p className="hero-text">
-            Your donation powers Greenpeace's global campaigns to protect our
-            oceans, forests, and climate. Together, we can create a sustainable
-            future for generations to come.
-          </p>
         </div>
       </section>
 
-      <section className="donation-section">
-        <div className="section-container wide">
-          <div className="section-heading">
-            <h2 className="section-title">Choose Your Impact Level</h2>
-            <p className="section-subtitle">Select a monthly commitment or make a one-time donation</p>
-          </div>
-          
-          <div className="tiers-grid">
-            {donationTiers.map((tier) => (
-              <div 
-                key={tier.id} 
-                onClick={() => { 
-                  setSelectedTier(tier.id); 
-                  setDonationAmount(tier.amount.toString()); 
-                  setFrequency(tier.frequency); 
-                }} 
-                className={`tier-card ${selectedTier === tier.id ? "tier-selected" : ""}`}
-              >
-                <h3 className="tier-amount">${tier.amount}</h3>
-                <p className="tier-frequency">{tier.frequency}</p>
-                <p className="tier-title">{tier.title}</p>
-                <p className="tier-description">{tier.description}</p>
-                <div className="tier-impact-box">
-                  <p className="tier-impact-text">{tier.impact}</p>
+      <section className="donation-section py-16 bg-white max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-start">
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">1. Select Campaign</h2>
+          <select 
+            className="w-full p-4 border-2 border-slate-100 rounded-2xl outline-none focus:border-emerald-500 bg-slate-50 font-medium"
+            value={selectedCampaign?.id}
+            onChange={(e) => setSelectedCampaign(campaigns.find(c => c.id.toString() === e.target.value))}
+          >
+            {campaigns.map(cp => <option key={cp.id} value={cp.id}>{cp.title}</option>)}
+          </select>
+
+          {selectedCampaign && (
+            <div className={`rounded-3xl border shadow-sm p-8 space-y-6 ${isCompleted() ? 'bg-slate-50 border-slate-200' : 'bg-emerald-50/50 border-emerald-100'}`}>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 text-emerald-700 font-bold uppercase text-xs tracking-widest">
+                  <TrendingUp size={20} /> Progress
                 </div>
+                {isCompleted() && <span className="px-3 py-1 bg-slate-200 text-slate-600 rounded-full text-[10px] font-black uppercase">Finished</span>}
               </div>
-            ))}
-          </div>
-
-          <div className="custom-donation-box">
-            <h3 className="custom-title">Select Campaign & Amount</h3>
-            
-            <div className="custom-form">
-              {/* BỘ CHỌN CHIẾN DỊCH MỚI */}
-              <select 
-                className="custom-select"
-                value={selectedCampaignId}
-                onChange={(e) => setSelectedCampaignId(e.target.value)}
-                style={{ minWidth: '200px' }}
-              >
-                {campaigns.map((cp) => (
-                  <option key={cp.id} value={cp.id}>
-                    {cp.title}
-                  </option>
-                ))}
-              </select>
-
-              <input 
-                type="number" 
-                value={donationAmount} 
-                onChange={(e) => setDonationAmount(e.target.value)} 
-                placeholder="Amount" 
-                className="custom-input"
-              />
               
-              <select 
-                className="custom-select" 
-                value={frequency} 
-                onChange={(e) => setFrequency(e.target.value)}
-              >
-                <option value="Monthly">Monthly</option>
-                <option value="One-time">One-time</option>
-              </select>
-
-              <button className="donate-button" onClick={handleDonateNow}>
-                Donate Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="impact-section">
-        <div className="section-container wide">
-          <div className="section-heading">
-            <h2 className="section-title">Your Impact Matters</h2>
-            <p className="section-subtitle">See what your generosity can accomplish</p>
-          </div>
-          <div className="impact-grid">
-            {impacts.map((item, index) => (
-              <div key={index} className="impact-card">
-                <div className="impact-card-inner">
-                  <div className="impact-icon-box">
-                    <Check size={24} className="impact-icon" />
-                  </div>
-                  <div>
-                    <p className="impact-amount">{item.amount}</p>
-                    <p className="impact-text">{item.impact}</p>
-                  </div>
+              <div className="space-y-2">
+                <span className={`text-5xl font-black ${isCompleted() ? 'text-slate-500' : 'text-emerald-600'}`}>{selectedCampaign.progressPercentage}%</span>
+                <div className="w-full h-4 bg-white rounded-full border border-emerald-100 overflow-hidden">
+                  <div className={`h-full transition-all duration-1000 ${isCompleted() ? 'bg-slate-400' : 'bg-emerald-500'}`} style={{ width: `${selectedCampaign.progressPercentage}%` }}></div>
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-2xl border">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Raised</p>
+                  <p className="text-xl font-bold">${selectedCampaign.raisedAmount?.toLocaleString()}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Target</p>
+                  <p className="text-xl font-bold">${selectedCampaign.targetAmount?.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <button onClick={() => setShowMoreInfo(!showMoreInfo)} className="flex items-center gap-2 text-sm font-bold text-emerald-700">
+                {showMoreInfo ? <ChevronUp size={18} /> : <ChevronDown size={18} />} View details
+              </button>
+
+              {showMoreInfo && (
+                <div className="pt-4 border-t border-emerald-100 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-600 font-medium">
+                    <div className="flex items-center gap-2">
+                      <MapPin size={16} className="text-emerald-500" /> 
+                      <span>Location: {selectedCampaign.location || "Global"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-emerald-500" /> 
+                      <span>Deadline: {new Date(selectedCampaign.endDate).toLocaleDateString('en-GB')}</span>
+                    </div>
+                  </div>
+                  <div 
+                    className="text-sm text-slate-600 leading-relaxed italic border-l-4 border-emerald-200 pl-4" 
+                    dangerouslySetInnerHTML={{ __html: selectedCampaign.description }} 
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white p-8 rounded-[2rem] shadow-2xl border border-slate-50 space-y-6">
+          <h2 className="text-2xl font-bold text-slate-900">2. Donation Details</h2>
+          
+          <div className="grid grid-cols-4 gap-3">
+            {donationTiers.map(tier => (
+              <button 
+                key={tier.id}
+                disabled={isCompleted()}
+                onClick={() => setDonationAmount(tier.amount.toString())}
+                className={`p-4 rounded-2xl border-2 transition-all ${donationAmount === tier.amount.toString() ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}
+              >
+                <p className="text-xl font-black">${tier.amount}</p>
+              </button>
             ))}
           </div>
+
+          <div className="space-y-4">
+            <input type="number" placeholder="Other Amount ($)" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-emerald-500 font-bold" value={donationAmount} onChange={e => setDonationAmount(e.target.value)} />
+            <input type="text" placeholder="Full Name (Optional)" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-emerald-500" value={donorName} onChange={e => setDonorName(e.target.value)} />
+            <textarea placeholder="Message" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-emerald-500 h-24" value={message} onChange={e => setMessage(e.target.value)} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button onClick={() => setPaymentMethod("QR_CODE")} className={`p-4 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold ${paymentMethod === "QR_CODE" ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100'}`}>
+              <QrCode size={20} /> Bank Transfer
+            </button>
+            <button onClick={() => setPaymentMethod("CARD")} className={`p-4 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold ${paymentMethod === "CARD" ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100'}`}>
+              <CreditCard size={20} /> Visa / Debit
+            </button>
+          </div>
+
+          <button onClick={handleDonateNow} disabled={isCompleted()} className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-black text-xl hover:bg-emerald-700 shadow-xl transition-all disabled:bg-slate-300">
+            {isCompleted() ? "Campaign Closed" : "Donate Now"}
+          </button>
         </div>
       </section>
 
-      <section className="faq-section">
-        <div className="section-container">
-          <div className="section-heading">
-            <h2 className="section-title">Frequently Asked Questions</h2>
-            <p className="section-subtitle">
-              Get answers to common questions about donating to Greenpeace
-            </p>
-          </div>
-          <Accordion type="single" collapsible className="faq-accordion">
+      <section className="faq-section py-20 bg-slate-50">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="text-center mb-12"><h2 className="text-3xl font-bold">Frequently Asked Questions</h2></div>
+          <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`faq-${index}`}>
-                <AccordionTrigger className="faq-question">
-                  {faq.q}
-                </AccordionTrigger>
-                <AccordionContent className="faq-answer">
-                  {faq.a}
-                </AccordionContent>
+              <AccordionItem key={index} value={`faq-${index}`} className="border bg-white rounded-2xl px-6">
+                <AccordionTrigger className="font-bold text-left hover:no-underline">{faq.q}</AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-loose pb-6">{faq.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
-      </section>
-
-      <section className="cta-section">
-        <div className="cta-container">
-          <h2 className="cta-title">Ready to Make a Difference?</h2>
-          <p className="cta-text">
-            Join thousands of supporters creating real environmental change.
-            Your donation starts today.
-          </p>
-          <button className="cta-button" onClick={handleDonateNow}>
-            Start Your Donation
-          </button>
         </div>
       </section>
     </div>

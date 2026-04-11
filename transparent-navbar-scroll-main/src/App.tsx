@@ -16,6 +16,8 @@ import CampaignDetail from "./pages/CampaignDetail.tsx";
 import News from "./pages/News.tsx";
 import NewsDetail from "./pages/NewsDetail.tsx";
 import AboutUs from "./pages/AboutUs.tsx";
+import Sponsors from "./pages/Sponsors.tsx";
+import Contacts from "./pages/Contacts.tsx";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,7 @@ const AppContent = () => {
           <Route path="/donate" element={<Donate key={location.pathname} />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/events" element={<EventPage />} />
+          <Route path="contact" element={<Contacts/>} />
           <Route path="*" element={<NotFound />} />
           {/* Tuyến 1: Trang danh sách chiến dịch */}
           <Route path="/campaign" element={<CampaignList />} />
@@ -41,6 +44,8 @@ const AppContent = () => {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/events" element={<EventPage />} />
         </Routes>
       </main>
 
