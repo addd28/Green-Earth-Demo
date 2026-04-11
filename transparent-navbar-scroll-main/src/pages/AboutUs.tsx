@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export default function AboutUs() {
   const [info, setInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const API = "http://localhost:8080/api/green_earth/organization_info";
+  const API = "http://localhost:8081/api/green_earth/organization_info";
 
   useEffect(() => {
     const fetchData = async () => {

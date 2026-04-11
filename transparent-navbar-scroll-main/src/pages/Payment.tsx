@@ -50,7 +50,7 @@ const Payment = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/green_earth/donation", {
+      const response = await fetch("http://localhost:8081/api/green_earth/donation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(donationReq),
@@ -61,7 +61,7 @@ const Payment = () => {
           setLoading(false);
           alert("Thank you! Donation successful.");
           localStorage.removeItem("pending_donation");
-          navigate("/donate");
+          navigate(`/campaign/${campaignId}`);
         }, 2000);
       } else { 
         setLoading(false);

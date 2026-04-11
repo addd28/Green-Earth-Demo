@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, Loader2, Globe, ShieldCheck, HeartHandshake } from 'lucide-react';
 
-const API_URL = "http://localhost:8080/api/green_earth/organization_info";
+const API_URL = "http://localhost:8081/api/green_earth/organization_info";
 
 const Contact = () => {
   const [orgInfo, setOrgInfo] = useState<any>(null);

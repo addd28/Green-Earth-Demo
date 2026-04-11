@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react"; 
 import { motion } from "framer-motion";
 
-const API_PARTNERS = "http://localhost:8080/api/green_earth/partner";
+const API_PARTNERS = "http://localhost:8081/api/green_earth/partner";
 
 const PartnersSlide = () => {
   const [partners, setPartners] = useState([]);
