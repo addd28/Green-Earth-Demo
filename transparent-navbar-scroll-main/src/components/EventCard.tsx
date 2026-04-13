@@ -1,16 +1,17 @@
 import { useState } from "react";
+import { apiUrl } from "@/lib/apiBase";
 
 const EventCard = ({ event }: any) => {
   const [loading, setLoading] = useState(false);
 
   const handleJoin = async () => {
-    const email = prompt("Nhập email của bạn:");
+    const email = prompt("Enter your email:");
     if (!email) return;
 
     setLoading(true);
 
     try {
-      await fetch("http://localhost:8081/api/event-participants", {
+      await fetch(apiUrl("/api/event-participants"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -21,9 +22,9 @@ const EventCard = ({ event }: any) => {
         })
       });
 
-      alert("Đăng ký thành công!");
+      alert("Registration successful!");
     } catch (err) {
-      alert("Có lỗi xảy ra!");
+      alert("Something went wrong.");
     } finally {
       setLoading(false);
     }

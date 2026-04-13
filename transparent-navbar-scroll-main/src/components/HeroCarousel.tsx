@@ -7,18 +7,21 @@ import hero3 from "@/assets/hero-3.jpg";
 const slides = [
   {
     image: hero1,
-    title: "Peace not war",
-    description: "As the terrible toll of conflict mounts, people and nature need immediate protection. The world needs peaceful diplomatic solutions – and distributed energy syste...",
+    title: "Peace, not war",
+    description:
+      "War devastates people and nature. The world needs peaceful diplomacy and sustainable energy for every community.",
   },
   {
     image: hero2,
-    title: "Protect our forests",
-    description: "Forests are the lungs of the Earth. Every year, millions of hectares are destroyed. We must act now to preserve these vital ecosystems for future generations.",
+    title: "Protect green forests",
+    description:
+      "Forests are Earth’s lungs. Millions of hectares disappear each year — act now to preserve ecosystems for future generations.",
   },
   {
     image: hero3,
-    title: "Save our oceans",
-    description: "Our oceans are drowning in plastic. Marine life is suffering. Join us in the fight to protect the world's seas and the creatures that call them home.",
+    title: "Save the oceans",
+    description:
+      "Oceans are drowning in plastic waste. Marine life is at risk. Join us to protect the sea and life below water.",
   },
 ];
 

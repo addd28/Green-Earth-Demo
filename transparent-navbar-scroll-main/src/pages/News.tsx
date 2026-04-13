@@ -1,108 +1,111 @@
 // src/pages/News.tsx
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { Calendar, User, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { Calendar, ArrowRight, Loader2, Search } from "lucide-react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { unwrapListData } from "@/lib/unwrapListData";
 
-// Helper function: Loại bỏ thẻ HTML để hiển thị bản tin vắn (tóm tắt)
 const stripHtmlTags = (htmlString: string) => {
-  if (!htmlString) return '';
-  const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+  if (!htmlString) return "";
+  const doc = new DOMParser().parseFromString(htmlString, "text/html");
   return doc.body.textContent || "";
-};
-
-// Helper function: Định dạng ngày tháng (YYYY-MM-DD) - Đồng bộ với NewsDetail
-const formatDate = (dateString: string) => {
-  if (!dateString) return "Updating...";
-  return dateString.split('T')[0];
 };
 
 export default function News() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 400);
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        setLoading(true);       
-        const response = await axios.get('http://localhost:8081/api/green_earth/article');
-        if (response.data && response.data.data) {
-          setArticles(response.data.data);
-        }
-        setLoading(false);
+        setLoading(true);
+        const params = new URLSearchParams({ page: "0", size: "100" });
+        if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
+        const response = await axios.get(`/api/green_earth/article?${params}`);
+        setArticles(unwrapListData(response.data?.data));
       } catch (err) {
-        console.error("Error loading news", err);
+        console.error("Failed to load news", err);
+      } finally {
         setLoading(false);
       }
     };
-    
-    fetchArticles();
-  }, []);
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center">
-      <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
-    </div>
-  );
+    fetchArticles();
+  }, [debouncedQuery]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-slate-50 min-h-screen"> 
-      {/* 1. HERO HEADER */}
+    <div className="bg-slate-50 min-h-screen">
       <div className="bg-emerald-900 pt-36 pb-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 font-serif">
             News & Stories
           </h1>
-          <p className="text-emerald-100 max-w-2xl mx-auto text-lg">
+          <p className="text-emerald-100 max-w-2xl mx-auto text-lg mb-8">
             Stay updated with the latest environmental news, inspiring stories, and eco-friendly tips.
           </p>
+          <div className="max-w-md mx-auto relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-700/70" />
+            <input
+              type="search"
+              placeholder="Search by title, content, category..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-emerald-100/30 bg-white/95 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-300 outline-none text-sm"
+            />
+          </div>
         </div>
       </div>
 
-      {/* 2. ARTICLE GRID */}
       <div className="max-w-6xl mx-auto px-4 -mt-12 pb-20 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
-            <div key={article.id} className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group">
-              
-              {/* Cover Image & Category Tag */}
+            <div
+              key={article.id}
+              className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group"
+            >
               <div className="h-56 bg-slate-200 relative overflow-hidden">
-                <img 
-                  src={article.image || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80"} 
-                  alt={article.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                <img
+                  src={
+                    article.image ||
+                    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80"
+                  }
+                  alt={article.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                  {article.category || "News"}
+                  {article.categoryName || "News"}
                 </div>
               </div>
 
-              {/* Content Section */}
               <div className="p-6 flex-1 flex flex-col">
                 <h2 className="text-xl font-bold text-slate-800 mb-3 leading-snug group-hover:text-emerald-600 transition-colors line-clamp-2">
                   {article.title}
                 </h2>
-                
+
                 <p className="text-slate-600 text-sm mb-6 line-clamp-3 flex-1">
-                  {stripHtmlTags(article.description || article.content)}
+                  {stripHtmlTags(article.content || "")}
                 </p>
 
-                {/* Footer Card: Date & Author - ĐÃ FIX HIỂN THỊ NGÀY */}
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-500 mb-6 border-t border-slate-100 pt-4">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-emerald-500" /> 
-                    {/* Kiểm tra nhiều trường dữ liệu trả về từ API */}
-                    {formatDate(article.publishedAt || article.createdAt || article.created_at)}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-emerald-500" /> 
-                    {article.author || article.createdBy?.username || "Admin"}
-                  </span>
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-6 border-t border-slate-100 pt-4">
+                  <Calendar className="w-4 h-4 text-emerald-500" />
+                  {article.createdAt
+                    ? new Date(article.createdAt).toLocaleDateString("en-GB")
+                    : "—"}
                 </div>
 
-                {/* Action Button */}
-                <Link 
-                  to={`/news/${article.id}`} 
+                <Link
+                  to={`/news/${article.id}`}
                   className="flex items-center justify-center gap-2 w-full text-center bg-emerald-50 text-emerald-700 rounded-xl py-3 font-bold hover:bg-emerald-600 hover:text-white transition-all group/btn"
                 >
                   READ MORE
@@ -112,12 +115,8 @@ export default function News() {
             </div>
           ))}
         </div>
-
-        {/* Empty State */}
         {articles.length === 0 && (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-slate-100">
-            <p className="text-slate-500">No articles available at the moment.</p>
-          </div>
+          <p className="text-center text-slate-500 py-12">No matching articles found.</p>
         )}
       </div>
     </div>
