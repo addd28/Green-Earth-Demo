@@ -11,14 +11,18 @@ import Payment from "./pages/Payment.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import EventPage from "./pages/EventPage.tsx";
-import EventDetail from "./pages/EventDetail.tsx"; // ✅ giữ
+import EventDetail from "./pages/EventDetail.tsx";
 import CampaignList from "./pages/CampaignList.tsx";
 import CampaignDetail from "./pages/CampaignDetail.tsx";
 import News from "./pages/News.tsx";
 import NewsDetail from "./pages/NewsDetail.tsx";
 import AboutUs from "./pages/AboutUs.tsx";
 import Sponsors from "./pages/Sponsors.tsx";
-import Contacts from "./pages/Contacts.tsx"; // ✅ giữ
+import Contacts from "./pages/Contacts.tsx";
+import Partners from "./pages/Partners.tsx";
+import PartnerLogin from "./pages/PartnerLogin.tsx";
+import PartnerPortal from "./pages/PartnerPortal.tsx";
+import SearchResults from "./pages/SearchResults.tsx";
 
 const queryClient = new QueryClient();
 
@@ -35,24 +39,25 @@ const AppContent = () => {
           <Route path="/donate" element={<Donate key={location.pathname} />} />
           <Route path="/payment" element={<Payment />} />
 
-          {/* Events */}
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/:id" element={<EventDetail />} />
 
-          {/* Campaign */}
           <Route path="/campaign" element={<CampaignList />} />
           <Route path="/campaign/:id" element={<CampaignDetail />} />
 
-          {/* News */}
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
 
-          {/* Other */}
           <Route path="/about" element={<AboutUs />} />
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contacts />} />
 
-          {/* 404 */}
+          <Route path="/partners" element={<Partners />} />
+          <Route path="/partner-login" element={<PartnerLogin />} />
+          <Route path="/partner-portal" element={<PartnerPortal />} />
+
+          <Route path="/search" element={<SearchResults />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

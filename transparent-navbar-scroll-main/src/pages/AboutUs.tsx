@@ -2,24 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { apiUrl } from "@/lib/apiBase";
 
 export default function AboutUs() {
   const [info, setInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const API = "http://localhost:8081/api/green_earth/organization_info";
+  const API = apiUrl("/api/green_earth/organization_info");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch(API);
-        if (!res.ok) throw new Error("Không thể kết nối đến server");
+        if (!res.ok) throw new Error("Could not connect to the server");
         const result = await res.json();
         
-        // Xử lý lấy object đầu tiên từ mảng data hoặc object trực tiếp
         const data = result.data ? (Array.isArray(result.data) ? result.data[0] : result.data) : result;
         setInfo(data);
       } catch (err) {
-        console.error("Lỗi lấy dữ liệu About Us:", err);
+        console.error("Failed to load About Us data:", err);
       } finally {
         setLoading(false);
       }
@@ -39,9 +39,8 @@ export default function AboutUs() {
 
   return (
     <div className="min-h-screen bg-white text-left">
-      {/* --- 1. HERO SECTION (STYLE GREENPEACE) --- */}
+      {/* Hero */}
       <section className="relative h-[65vh] flex items-center overflow-hidden bg-slate-900">
-        {/* Ảnh nền lấy từ Logo hoặc một ảnh mặc định */}
         <div className="absolute inset-0 opacity-40">
           <img 
             src={info.logo || "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000"} 
@@ -50,7 +49,6 @@ export default function AboutUs() {
           />
         </div>
         
-        {/* Lớp phủ mờ dần (Gradient) để nổi bật nội dung */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
         
         <div className="container mx-auto px-6 relative z-10 pt-20">
@@ -75,17 +73,15 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* --- 2. MAIN CONTENT SECTION --- */}
+      {/* Main content */}
       <section className="py-20 bg-white relative">
         <div className="container mx-auto px-6 max-w-4xl">
           
-          {/* TIÊU ĐỀ PHỤ NẾU CẦN */}
           <div className="mb-12 border-l-4 border-gp-green pl-6">
             <span className="text-gp-green font-black uppercase tracking-[0.2em] text-sm">About our work</span>
             <h2 className="text-3xl font-bold text-slate-900 mt-2 italic">Inspiring change through action.</h2>
           </div>
 
-          {/* --- KHU VỰC HIỂN THỊ NỘI DUNG TỪ RICH TEXT (QUILL) --- */}
           <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -94,7 +90,6 @@ export default function AboutUs() {
             style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             dangerouslySetInnerHTML={{ __html: info.description }} 
           />
-          {/* -------------------------------------------------------- */}
           
         </div>
       </section>

@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react"; 
 import { motion } from "framer-motion";
 
-const API_PARTNERS = "http://localhost:8081/api/green_earth/partner";
+import { apiUrl } from "@/lib/apiBase";
+
+const API_PARTNERS = apiUrl("/api/green_earth/partner");
 
 const PartnersSlide = () => {
   const [partners, setPartners] = useState([]);
@@ -18,7 +20,7 @@ const PartnersSlide = () => {
         const data = result.data || result || [];
         setPartners([...data].reverse());
       } catch (error) {
-        console.error("Lỗi lấy dữ liệu đối tác:", error);
+        console.error("Failed to load partners:", error);
       } finally {
         setLoading(false);
       }
@@ -26,13 +28,9 @@ const PartnersSlide = () => {
     fetchPartners();
   }, []);
 
-  // Hàm điều khiển trượt tính toán theo chiều rộng màn hình
   const slide = useCallback((direction) => {
     if (sliderRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-      
-      // Tính toán trượt bằng đúng 1/5 chiều rộng màn hình (trượt 1 logo mỗi lần)
-      // Nếu ở mobile thì trượt 1/2 chiều rộng
       const itemWidth = clientWidth >= 1024 ? clientWidth / 5 : (clientWidth >= 768 ? clientWidth / 3 : clientWidth / 2);
 
       if (direction === "right") {
@@ -72,11 +70,11 @@ const PartnersSlide = () => {
         </h2>
 
         <div 
-          className="relative group" // Bỏ px-12 để viền slide rộng ra sát mép
+          className="relative group"
           onMouseEnter={() => setIsHovered(true)}  
           onMouseLeave={() => setIsHovered(false)} 
         >
-          {/* Nút Trái */}
+          {/* Prev */}
           <button 
             onClick={() => slide("left")} 
             className="absolute -left-4 md:-left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100 shadow-lg border border-slate-100"
@@ -84,10 +82,9 @@ const PartnersSlide = () => {
             <ChevronLeft size={24} />
           </button>
 
-          {/* Danh sách Logo */}
+          {/* Logos */}
           <div 
             ref={sliderRef}
-            // ĐÃ SỬA: Xóa gap đi, sử dụng padding bên trong item
             className="flex items-center overflow-x-auto snap-x snap-mandatory py-6"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
@@ -96,7 +93,6 @@ const PartnersSlide = () => {
             {partners.map((partner) => (
               <motion.div 
                 key={partner.id} 
-                // ĐÃ SỬA Ở ĐÂY: w-1/5 (20%) trên desktop, w-1/3 trên tablet, w-1/2 trên mobile
                 className="snap-center flex-shrink-0 w-1/2 md:w-1/3 lg:w-1/5 flex items-center justify-center px-6"
               >
                 <a 
@@ -108,7 +104,6 @@ const PartnersSlide = () => {
                   <img 
                     src={partner.logo} 
                     alt={partner.name} 
-                    // Chỉnh ảnh nằm gọn gàng bên trong khung 20%
                     className="max-w-full h-20 md:h-24 lg:h-28 object-contain transition-all duration-500 hover:scale-110 filter grayscale hover:grayscale-0" 
                     onError={(e) => {
                         const target = e.currentTarget;
@@ -123,7 +118,7 @@ const PartnersSlide = () => {
             ))}
           </div>
 
-          {/* Nút Phải */}
+          {/* Next */}
           <button 
             onClick={() => slide("right")} 
             className="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100 shadow-lg border border-slate-100"

@@ -2,60 +2,35 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from "@/lib/apiBase";
 import { Calendar, User, ArrowLeft, Loader2, Tag } from 'lucide-react';
 
 export default function NewsDetail() {
   const { id } = useParams(); 
   const [article, setArticle] = useState<any>(null);
-  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchArticleDetail = async () => {
       try {
         setLoading(true);
-
-        // 1. Lấy chi tiết bài viết (dùng 8081 cho đồng bộ backend mới)
-        const articleRes = await axios.get(`http://localhost:8081/api/green_earth/article/${id}`);
-        if (articleRes.data && articleRes.data.data) {
-          setArticle(articleRes.data.data);
+        const response = await axios.get(apiUrl(`/api/green_earth/article/${id}`));
+        if (response.data && response.data.data) {
+          setArticle(response.data.data);
         }
-
-        // 2. Lấy danh mục
-        const categoryRes = await axios.get('http://localhost:8081/api/green_earth/article_categories');
-        if (categoryRes.data && categoryRes.data.data) {
-          setCategories(categoryRes.data.data);
-        }
-
       } catch (error) {
-        console.error("Error loading article detail:", error);
+        console.error("Failed to load article:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) fetchData();
+    if (id) fetchArticleDetail();
   }, [id]);
 
-  // Lấy tên danh mục
-  const getCategoryName = () => {
-    if (!article) return "Green News";
-
-    if (article.category?.name) return article.category.name;
-
-    const found = categories.find(c => 
-      c.id === article.categoryId || 
-      c.id === article.category_id || 
-      c.id === article.category?.id
-    );
-
-    return found ? found.name : "Environmental";
-  };
-
-  const formatDate = (dateValue: any) => {
-    if (!dateValue) return "Updating...";
-    const date = new Date(dateValue);
-    return isNaN(date.getTime()) ? "Updating..." : date.toLocaleDateString('en-GB');
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Coming soon";
+    return dateString.split('T')[0];
   };
 
   if (loading) return (
@@ -64,14 +39,11 @@ export default function NewsDetail() {
     </div>
   );
 
-  if (!article) return (
-    <div className="text-center py-20 text-slate-500 bg-slate-50 min-h-screen">
-      Article not found!
-    </div>
-  );
+  if (!article) return <div className="text-center py-20 text-slate-500 bg-slate-50 min-h-screen">Article not found.</div>;
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 relative">
+      
       <div className="bg-emerald-900 text-white pt-32 pb-16 px-4 relative overflow-hidden">
         {article.image && (
           <div className="absolute inset-0 opacity-10">
@@ -81,44 +53,43 @@ export default function NewsDetail() {
         
         <div className="max-w-4xl mx-auto relative z-10">
           <Link to="/news" className="inline-flex items-center gap-2 text-emerald-300 hover:text-white mb-6 transition-colors font-medium">
-            <ArrowLeft className="w-5 h-5" /> Back to News
+            <ArrowLeft className="w-5 h-5" /> Back to news
           </Link>
           
           <div className="mb-4">
             <span className="bg-emerald-700 text-emerald-100 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest inline-flex items-center gap-1.5 border border-emerald-600/50">
-              <Tag className="w-3 h-3" /> 
-              {getCategoryName()}
+              <Tag className="w-3 h-3" /> {article.categoryName || article.category || "News"}
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">
-            {article.title}
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">{article.title}</h1>
           
           <div className="flex flex-wrap gap-6 text-emerald-100 text-sm border-t border-emerald-800/50 pt-4 mt-4">
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-emerald-400" /> 
-              Published: {formatDate(article.createdAt || article.publishedAt)}
+              Published: {formatDate(article.publishedAt || article.created_at || article.createdAt)}
             </span>
             <span className="flex items-center gap-2">
               <User className="w-4 h-4 text-emerald-400" /> 
-              Author: {article.author?.username || article.authorName || "Editorial Team"}
+              Author: {article.author || article.createdBy?.username || "Editorial team"}
             </span>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 mt-8 relative z-10 -mt-8">
-        <div className="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 md:p-14 mb-12">
+        <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-8 md:p-14 mb-12">
+          
           {article.image && (
             <img 
               src={article.image} 
               alt={article.title} 
-              className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm" 
+              className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm"
             />
           )}
+
           <div 
-            className="prose prose-emerald prose-lg max-w-none text-slate-700 leading-relaxed break-words w-full"
+            className="prose prose-emerald prose-lg max-w-none text-slate-700 leading-relaxed [&>p]:mb-5 break-words overflow-hidden w-full [&>img]:rounded-2xl [&>img]:shadow-md [&>img]:mx-auto [&>img]:my-8"
             dangerouslySetInnerHTML={{ __html: article.content || article.description }} 
           />
         </div>

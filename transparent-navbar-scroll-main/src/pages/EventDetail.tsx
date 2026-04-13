@@ -5,8 +5,9 @@ import {
   CheckCircle2, Users, Info, Send 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { apiUrl } from "@/lib/apiBase";
 
-const API_URL = "http://localhost:8081/api/green_earth/event";
+const API_URL = apiUrl("/api/green_earth/event");
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export default function EventDetail() {
     setStatusMsg({ type: '', content: '' });
 
     try {
-      const response = await fetch(`http://localhost:8081/api/green_earth/event/register`, {
+      const response = await fetch(apiUrl("/api/green_earth/event/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -68,7 +69,7 @@ export default function EventDetail() {
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-green-600" /></div>;
   if (!event) return <div className="text-center py-20 text-gray-500 font-medium pt-32">Event not found.</div>;
 
-  // LOGIC KIỂM TRA TRẠNG THÁI (Đồng bộ với Campaign)
+  // Status vs today (aligned with campaign pages)
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const eventDay = event.eventDate ? new Date(event.eventDate) : null;
@@ -78,7 +79,7 @@ export default function EventDetail() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 text-left">
       
-      {/* --- HERO SECTION (Đồng bộ Style với CampaignDetail) --- */}
+      {/* Hero */}
       <div className="bg-green-900 text-white pt-32 pb-24 px-4 relative overflow-hidden">
         {event.image && (
           <div className="absolute inset-0 opacity-20">
@@ -123,7 +124,7 @@ export default function EventDetail() {
       {/* --- MAIN CONTENT SECTION --- */}
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 -mt-10">
         
-        {/* Cột Trái: Thông tin chi tiết (Fix tràn nội dung) */}
+        {/* Main column */}
         <div className="lg:col-span-2 space-y-8">
           <div className="bg-white p-6 md:p-10 rounded-3xl shadow-lg border border-slate-100">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b pb-4 flex items-center gap-2">
@@ -134,7 +135,6 @@ export default function EventDetail() {
                 <img src={event.image} alt="illustration" className={`w-full max-h-[400px] object-cover ${status === 'COMPLETED' ? 'grayscale opacity-80' : ''}`} />
             </div>
 
-            {/* Render HTML và chống tràn chữ */}
             <div 
               className="prose prose-green max-w-none text-slate-600 leading-loose break-words overflow-hidden" 
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
@@ -143,7 +143,7 @@ export default function EventDetail() {
           </div>
         </div>
 
-        {/* Cột Phải: Form đăng ký (Sticky) */}
+        {/* Registration sidebar */}
         <div className="relative">
           <div className="bg-white p-8 rounded-3xl shadow-xl border border-green-100 lg:sticky lg:top-24">
             <div className="text-center mb-8">
@@ -154,7 +154,6 @@ export default function EventDetail() {
               <p className="text-sm text-gray-500 mt-1">Join us in this activity</p>
             </div>
 
-            {/* KIỂM TRA TRẠNG THÁI: Nếu đã xong thì đóng form */}
             {status === 'COMPLETED' ? (
               <div className="mt-2 bg-slate-50 border border-slate-100 rounded-2xl p-6 text-center">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">

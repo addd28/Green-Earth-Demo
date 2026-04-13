@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Search, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import NavbarSearch from "@/components/NavbarSearch";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -13,12 +14,13 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-  { name: "Campaigns", path: "/campaign" },
-  { name: "Events", path: "/events" },
-  { name: "News and Stories", path: "/news" },
-  { name: "Sponsors", path: "/sponsors" },
-  { name: "About us", path: "/about" }
-];
+    { name: "Campaigns", path: "/campaign" },
+    { name: "Events", path: "/events" },
+    { name: "News and Stories", path: "/news" },
+    { name: "About us", path: "/about" },
+    { name: "Sponsors", path: "/sponsors" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   return (
     <nav
@@ -39,16 +41,15 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
+          <Link to="/partners" className="bg-gp-green/90 text-primary-foreground px-5 py-2 text-sm font-bold hover:brightness-110 transition">
+            Become Partner
+          </Link>
           <Link to="/donate" className="bg-gp-green text-primary-foreground px-5 py-2 text-sm font-bold flex items-center gap-1 hover:brightness-110 transition">
             Donate
           </Link>
         </div>
         <div className="hidden lg:flex items-center gap-2">
-          <input type="text" placeholder="Search" className={`bg-transparent border-b text-sm py-1 px-2 w-32 focus:outline-none transition-colors ${
-              scrolled ? "border-foreground text-foreground placeholder:text-muted-foreground" : "border-primary-foreground/50 text-primary-foreground placeholder:text-primary-foreground/60"
-            }`}
-          />
-          <Search size={18} className={scrolled ? "text-foreground" : "text-primary-foreground"} />
+          <NavbarSearch scrolled={scrolled} />
         </div>
         <button className="lg:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? (
@@ -66,14 +67,21 @@ const Navbar = () => {
                 key={link.name} 
                 to={link.path} 
                 className="text-foreground font-semibold text-sm"
-                onClick={() => setMobileOpen(false)} // Tự đóng menu khi nhấn chuyển trang
+                onClick={() => setMobileOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
+            <Link to="/partners" className="bg-gp-green/90 text-primary-foreground px-5 py-2 text-sm font-bold w-fit" onClick={() => setMobileOpen(false)}>
+              Become Partner
+            </Link>
             <Link to="/donate" className="bg-gp-green text-primary-foreground px-5 py-2 text-sm font-bold w-fit">
               Donate
             </Link>
+            <div className="pt-2 border-t border-border">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Search</p>
+              <NavbarSearch scrolled={true} className="w-full" inputClassName="!w-full" onNavigate={() => setMobileOpen(false)} />
+            </div>
           </div>
         </div>
       )}
